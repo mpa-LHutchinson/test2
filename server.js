@@ -1,21 +1,44 @@
 /*********************************************************************************
-* BTI325 – Test 2
+* BTI325 – Test 3
 * I declare that this test is my own work in accordance with Seneca Academic Policy.
 * No part of this test has been copied manually or electronically from any other source
 * (including web sites) or distributed to other students.
 *
-* Name: Liam Hutchinson Student ID: 184017218 Date: 10/19/2022
+* Name: Liam Hutchinson Student ID: 184017218 Date: 11/23/2022
 *
 * Online (Cyclic) URL:
-* 
+* https://lonely-pig-tank-top.cyclic.app/
 *
 ********************************************************************************/ 
 var express = require("express");
 var app = express();
 var path = require("path");
 var data = require("./test2_moduleB.js");
+var exphbs = require("express-handlebars");
+const {engine} = require("express-handlebars");
 
 var HTTP_PORT = process.env.PORT || 8080;
+
+app.engine('.hbs', engine({ extname: '.hbs', helpers: {
+
+  navLink: function(url, options){
+    return '<li' +
+    ((url == app.locals.activeRoute) ? ' class="active" ' : '') +
+    '><a href=" ' + url + ' ">' + options.fn(this) + '</a></li>';
+   },
+   
+   equal: function (lvalue, rvalue, options) {
+    if (arguments.length < 3)
+    throw new Error("Handlebars Helper equal needs 2 parameters");
+    if (lvalue != rvalue) {
+    return options.inverse(this);
+    } else {
+    return options.fn(this);
+    }
+   } 
+   
+}, defaultLayout: 'main'}));
+app.set('view engine', '.hbs');
 
 function onHttpStart() {
   console.log("Express http server listening on: " + HTTP_PORT);
@@ -24,7 +47,19 @@ function onHttpStart() {
 app.use(express.static('public'));
 
 app.get("/", function(req,res){
-    res.send("<h2>Declaration</h2><br />I acknowledge the colleges academic integrity policy - and my own integrity - remain in effect whether my work is done remotely or onsite. Any test or assignment is an act of trust between me and my instructor, and especially with my classmates... even when no one is watching. I declare I woll not break that trust.<br /><br /> Name: Liam Hutchinson <br /><br /> Student number: 184017218 <br /><br /><a href='/CPA'>Click to visit CPA students</a><br /><br /><a href='/highGPA'>Click to see who has the highest GPA</a>");
+  res.render('home');
+});
+
+app.get("/allStudents", function(req,res){
+  data.getAllStudents()
+    .then((data) => { res.render("students", {students: data})})
+    .catch((err) => { res.render({message: "no results"})  });
+});
+
+app.get("/allStudents/BSD", function(req,res){
+  data.getBSDStudents()
+    .then((data) => { res.render("students", {students: data})})
+    .catch((err) => { res.render({message: "no results"})  });
 });
 
 app.get("/CPA", function(req,res){
@@ -35,8 +70,8 @@ app.get("/CPA", function(req,res){
 
 app.get("/highGPA", function(req,res){
   data.highGPA()
-  .then((data) => { res.send(data) })
-  .catch((err) => { res.json({message: err}) });
+  .then((data) => { res.render("student",{student: data}) })
+  .catch((err) => { res.render({message: "no results"})  });
 });
 
 app.get("*", function(req,res){

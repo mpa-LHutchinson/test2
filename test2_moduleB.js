@@ -7,7 +7,7 @@
 * Name: Liam Hutchinson Student ID: 184017218 Date: 10/19/2022
 *
 * Online (Cyclic) URL:
-* 
+* https://lonely-pig-tank-top.cyclic.app/
 *
 ********************************************************************************/ 
 var studentList = [];
@@ -23,6 +23,31 @@ exports.prepare = function(){
     return new Promise(function(resolve, reject){
         console.log("prepare called");
         resolve("Data succesfully initialized!");
+    });
+}
+
+exports.getAllStudents = function(){
+    return new Promise(function(resolve, reject){
+            console.log("getAllStudents called");
+
+            resolve(studentList);
+            reject(reason);
+    });
+}
+
+exports.getBSDStudents = function(){
+    return new Promise(function(resolve, reject){
+            console.log("getBSDStudents called");
+            var bsdList = [];
+
+            for (student of studentList){
+                if(student.program == "BSD"){
+                    bsdList.push(student);
+                }
+            }
+
+            resolve(bsdList);
+            reject(reason);
     });
 }
 
@@ -51,7 +76,7 @@ exports.highGPA = function(){
             }
         }
 
-        resolve("<h2>Highest GPA:</h2><br />StudentID: " + highestStudent.studId + " <br /><br />Name: " + highestStudent.name + " <br /><br />Program: " + highestStudent.program + "<br /><br />GPA: " + highestStudent.gpa + " <br />");
+        resolve(highestStudent);
         reject(reason);
     });
 }
